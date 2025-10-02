@@ -1,37 +1,24 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "commonjs",
-    "target": "es2020",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "target": "es5", // Compile to ES5 for broader compatibility
+    "module": "commonjs", // Use CommonJS modules (Node.js default)
+    "sourceMap": true, // Generate source maps for debugging
+    "outDir": "./dist", // Output compiled files to the `dist` folder
+    "rootDir": "./src", // Define the root directory for your source files
+    "baseUrl": ".", // Required for path aliases
+    "esModuleInterop": true, // Enable better compatibility with ES modules
+    "strict": true, // Enable strict type-checking options
+    "skipLibCheck": true, // Skip type-checking of library files
+    "paths": {
+      // Define path aliases
+      "~/*": ["./src/*"]
+    }
   },
-  "include": ["src"]
+  "ts-node": {
+    // Configuration for ts-node
+    "transpileOnly": true, // Speeds up development
+    "require": ["tsconfig-paths/register"] // Enable path aliases in ts-node
+  },
+  "include": ["src/**/*"], // Include all files in the `src` directory
+  "exclude": ["node_modules"] // Exclude `node_modules` from compilation
 }
