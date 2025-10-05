@@ -1,9 +1,9 @@
 import express from "express";
-const router = express.Router();
-// We acually prefixes the mentioned endpoints with '/api/auth'
+import { signUp } from "~/controllers/auth.controller";
 
-router.get("/signup", (req, res) => {
-  res.send("Sign Up endpoint");
-});
+const router = express.Router();
+// We acually prefixes the mentioned endpoints with '/api/auth' -  app.use("/api/auth", authRoutes);
+
+router.get("/signup", signUp);
 
 export default router;
