@@ -1,3 +1,7 @@
+import { Response, Request } from "express";
+import z from "zod";
+import { SignUpBody, signUpSchema } from "./auth.validation";
+
 export function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
   try {
     const { fullName, email, password } = signUpSchema.parse(req.body);
