@@ -42,3 +42,12 @@ export async function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
     res.status(500).json({ message: "Invalid server error" });
   }
 }
+
+export async function logIn(
+) {
+  try {
+    const { email, password } = signUpSchema
+      .omit({ fullName: true })
+      .parse(req.body);
+  } catch (error) {}
+}
