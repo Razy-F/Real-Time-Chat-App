@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import z from "zod";
 import { SignUpBody, signUpSchema } from "./auth.validation";
 import { User } from "../user/user.model";
-import { genSalt, hash } from "bcryptjs";
+import { compare, genSalt, hash } from "bcryptjs";
 import { generateToken } from "~/lib/jwt";
 
 export async function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
@@ -49,5 +49,24 @@ export async function logIn(
     const { email, password } = signUpSchema
       .omit({ fullName: true })
       .parse(req.body);
-  } catch (error) {}
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    const isPasswordCorrect = await compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid credentials" });
+
+    generateToken(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error("Error in login controller: ", error);
+    res.status(500).json({ message: "Internal server" });
+  }
 }
