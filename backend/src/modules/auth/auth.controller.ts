@@ -70,3 +70,8 @@ export async function logIn(
     res.status(500).json({ message: "Internal server" });
   }
 }
+
+export async function logOut(req: Request, res: Response) {
+  res.cookie("jwt", "", { maxAge: 0 });
+  res.status(200).json({ message: "Logged out successfully" });
+}
