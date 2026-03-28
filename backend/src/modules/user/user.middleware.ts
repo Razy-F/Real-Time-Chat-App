@@ -1,11 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import env from "~/utils/envValidation";
-import { User } from "./user.model";
+import { TUser, User } from "./user.model";
+
+export interface AuthenticatedRequest extends Request {
+  user: TUser;
+}
+
+interface JwtPayloadWithUserId extends jwt.JwtPayload {
+  userId: string;
+}
+
 export async function protectRoute(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const token = req.cookies.jwt;
@@ -15,6 +24,20 @@ export async function protectRoute(
         .json({ message: "Unauthorized - No token provided" });
 
     const decoded = jwt.verify(token, env.JWT_SECRET);
+
+    if (
+      typeof decoded === "string" ||
+      !decoded ||
+      typeof decoded !== "object" ||
+      !("userId" in decoded)
+    ) {
+      return res.status(401).json({
+        message: "Unauthorized - Invalid token",
+      });
+    }
+
+    const payload = decoded as JwtPayloadWithUserId;
+
     if (!decoded)
       return res.status(401).json({ message: "Unauthorized - Invalid token" });
 
