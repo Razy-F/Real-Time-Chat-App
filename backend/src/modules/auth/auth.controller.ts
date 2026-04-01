@@ -71,7 +71,15 @@ export async function logIn(
   }
 }
 
-export async function logOut(req: Request, res: Response) {
+export async function logOut(_: Request, res: Response) {
   res.cookie("jwt", "", { maxAge: 0 });
   res.status(200).json({ message: "Logged out successfully" });
+}
+
+export async function updateProfile(req: Request, res: Response) {
+  try {
+  } catch (error) {
+    console.error("Error in login controller: ", error);
+    res.status(500).json({ message: "Internal server" });
+  }
 }
