@@ -86,6 +86,11 @@ export async function updateProfile(req: Request, res: Response) {
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    const isPasswordCorrect = await compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid credentials" });
+
   } catch (error) {
     console.error("Error in login controller: ", error);
     res.status(500).json({ message: "Internal server" });
