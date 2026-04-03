@@ -4,6 +4,8 @@ import { SignUpBody, signUpSchema } from "./auth.validation";
 import { User } from "../user/user.model";
 import { compare, genSalt, hash } from "bcryptjs";
 import { generateToken } from "~/lib/jwt";
+import { User } from "~/modules/user/user.model";
+import { SignUpBody, signUpSchema } from "./auth.validation";
 
 export async function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
   try {
@@ -78,6 +80,12 @@ export async function logOut(_: Request, res: Response) {
 
 export async function updateProfile(req: Request, res: Response) {
   try {
+    const { email, password } = signUpSchema
+      .omit({ fullName: true })
+      .parse(req.body);
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
   } catch (error) {
     console.error("Error in login controller: ", error);
     res.status(500).json({ message: "Internal server" });
