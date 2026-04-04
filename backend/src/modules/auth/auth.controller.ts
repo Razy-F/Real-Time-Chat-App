@@ -1,9 +1,8 @@
 import { Response, Request } from "express";
-import z from "zod";
-import { SignUpBody, signUpSchema } from "./auth.validation";
-import { User } from "../user/user.model";
 import { compare, genSalt, hash } from "bcryptjs";
+import { ZodError } from "zod";
 import { generateToken } from "~/lib/jwt";
+import zodFormError from "~/lib/zod-error-msg";
 import { User } from "~/modules/user/user.model";
 import { SignUpBody, signUpSchema } from "./auth.validation";
 
@@ -38,14 +37,16 @@ export async function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    if (error instanceof Error)
-      return res.status(400).json({ message: error.message });
+    if (error instanceof ZodError)
+      return res.status(400).json({ message: zodFormError(error) });
     else console.error("Error in signup controller ", error);
     res.status(500).json({ message: "Invalid server error" });
   }
 }
 
 export async function logIn(
+  req: Request<{}, {}, Omit<SignUpBody, "fullName">>,
+  res: Response,
 ) {
   try {
     const { email, password } = signUpSchema
