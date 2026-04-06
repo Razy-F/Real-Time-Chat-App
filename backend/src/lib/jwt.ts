@@ -1,19 +1,17 @@
 import { Response } from "express";
 import jwt from "jsonwebtoken";
+import { Types } from "mongoose";
 import env from "~/utils/envValidation";
 
 /**
  * Generates a JWT token for the specified user ID, sets it as an HTTP-only cookie,
  * and returns the token.
  *
- * @param {number} userId - The ID of the user to generate the token for.
+ * @param {ObjectId} userId - The ID of the user to generate the token for.
  * @param {Response} res - The Express response object used to set cookies.
  * @returns {string} - The generated JWT token.
  */
-export async function generateToken(
-  userId: number,
-  res: Response
-): Promise<string> {
+export function generateToken(userId: Types.ObjectId, res: Response) {
   // Sign a new JWT token with the user's ID, using the secret from environment variables
   const token = jwt.sign({ userId }, env.JWT_SECRET, {
     expiresIn: "7d", // Token expires in 7 days
