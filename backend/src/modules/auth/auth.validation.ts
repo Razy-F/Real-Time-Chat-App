@@ -8,4 +8,8 @@ const signUpSchema = z.object({
 
 type SignUpBody = z.infer<typeof signUpSchema>;
 
-export { signUpSchema, SignUpBody };
+const updateProfileSchema = z.object({
+  profilePic: z.string().min(1, "Profile picture is required"),
+});
+
+export { signUpSchema, SignUpBody, updateProfileSchema };

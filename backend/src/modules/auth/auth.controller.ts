@@ -4,7 +4,13 @@ import { ZodError } from "zod";
 import { generateToken } from "~/lib/jwt";
 import zodFormError from "~/lib/zod-error-msg";
 import { User } from "~/modules/user/user.model";
-import { SignUpBody, signUpSchema } from "./auth.validation";
+import {
+  SignUpBody,
+  signUpSchema,
+  updateProfileSchema,
+} from "./auth.validation";
+import env from "~/utils/envValidation";
+import cloudinary from "~/lib/cloudinary";
 
 export async function signUp(req: Request<{}, {}, SignUpBody>, res: Response) {
   try {
@@ -81,19 +87,22 @@ export async function logOut(_: Request, res: Response) {
 
 export async function updateProfile(req: Request, res: Response) {
   try {
-    const { email, password } = signUpSchema
-      .omit({ fullName: true })
-      .parse(req.body);
+    const { profilePic } = updateProfileSchema.parse(req.body);
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    const userId = req.user?._id;
 
-    const isPasswordCorrect = await compare(password, user.password);
-    if (!isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid credentials" });
+    const uploadRes = await cloudinary.uploader.upload(profilePic);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadRes.secure_url },
+      { new: true },
+    ).select("-password"); // The new true => return the updated user object
 
+    res.status(200).json(updatedUser);
   } catch (error) {
+    if (error instanceof ZodError)
+      return res.status(400).json({ message: zodFormError(error) });
     console.error("Error in login controller: ", error);
-    res.status(500).json({ message: "Internal server" });
+    res.status(500).json({ message: "Internal server error" });
   }
 }
